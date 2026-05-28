@@ -10,9 +10,10 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      lib = pkgs.lib;
     in
     {
-      packages.${system}.iso =
+      packages.${system}.minimalISO =
         (nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
@@ -21,30 +22,9 @@
             ./limineISO.nix
           ];
         }).config.system.build.isoImage;
-      checks.${system} = {
-        isoBootTest = pkgs.testers.runNixOSTest {
-          name = "limine iso boot test";
-          nodes = {
-            machine =
-              { pkgs, modulesPath, ... }:
-              {
-                virtualisation = {
-                  memorySize = 2048;
-                  cores = 2;
-                  qemu.options = [
-                    "-cdrom" "${self.packages.${system}.iso}/nixos-limine.iso"
-                    "-boot" "d"
-                  ];
-                };
-              };
-          };
-          testScript = ''
-            machine.start()
-            machine.wait_for_unit("multi-user.target")
-            machine.succeed("nixos-version")
-            machine.shutdown()
-          '';
-        };
+      checks.${system} = import ./tests.nix {
+        inherit pkgs lib nixpkgs;
+        iso = self.packages.${system}.minimalISO;
       };
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
