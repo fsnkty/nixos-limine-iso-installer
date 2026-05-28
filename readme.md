@@ -42,3 +42,11 @@ creates a minimal profile installer ISO with the limine boot loader
     };
 }
 ```
+
+# todo
+tl;dr more parity with `/nixos/modules/installer/cd-dvd/iso-image.nix`
+big ones that come to mind for now are
+- copy to memory
+- include memtest
+- include entrys for options such as
+  - reboot to firmware

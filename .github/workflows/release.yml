@@ -2,6 +2,10 @@ name: Build and Release NixOS limine boot ISO
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g., v1.0.0)'
+        required: true
 
 jobs:
   build-and-release:
@@ -29,4 +33,22 @@ jobs:
       - name: Upload ISO to GitHub Releases
         uses: softprops/action-gh-release@v2
         with:
+          name: Release ${{ inputs.tag_name }}
+          tag_name: ${{ inputs.tag_name }}
           files: 'result/nixos-limine.iso'
+          draft: false
+          prerelease: false
+          
+      - name: Prepare ISO Asset
+        id: prepare
+        run: |
+          cp -L result/nixos-limine.iso ./nixos-limine.iso
+
+      - name: Upload ISO to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          name: Release ${{ inputs.tag_name }}
+          files: nixos-limine.iso
+          draft: false
+          prerelease: false
