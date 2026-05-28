@@ -13,19 +13,25 @@
       lib = pkgs.lib;
     in
     {
+      nixosModules.limineISO = ./limineISO.nix;
+
+      # a minimal profile ISO using this module
+      # used both for tests and as an example
       packages.${system}.minimalISO =
         (nixpkgs.lib.nixosSystem {
           inherit system;
           modules = [
             "${nixpkgs}/nixos/modules/profiles/minimal.nix"
             "${nixpkgs}/nixos/modules/profiles/installation-device.nix"
-            ./limineISO.nix
+            self.nixosModules.limineISO
           ];
         }).config.system.build.isoImage;
+
       checks.${system} = import ./tests.nix {
         inherit pkgs lib nixpkgs;
         iso = self.packages.${system}.minimalISO;
       };
+
       devShells.${system}.default = pkgs.mkShell {
         buildInputs = [
           pkgs.nixpkgs-fmt
@@ -33,6 +39,7 @@
           pkgs.statix
         ];
       };
+
       formatter.${system} = pkgs.nixfmt-tree;
     };
 }
