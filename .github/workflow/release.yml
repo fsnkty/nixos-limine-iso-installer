@@ -1,0 +1,32 @@
+name: Build and Release NixOS limine boot ISO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
+      - name: Setup Nix Cache
+        uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock', '**/flake.nix') }}
+          restore-prefixes-first-match: |
+            nix-${{ runner.os }}-
+
+      - name: Build ISO Image
+        run: |
+          nix build .#minimalISO --print-build-logs
+
+      - name: Upload ISO to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: 'result/nixos-limine.iso'
