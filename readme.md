@@ -42,11 +42,18 @@ creates a minimal profile installer ISO with the limine boot loader
     };
 }
 ```
+# limineISO & upsteam nixos ISO bootloader comparisons
+🚧 - todo
+|feature|LimineISO|nixos|
+|:-:|:-:|:-:|
+|secure boot|❌[*](#limitations)|❌|
+|copy to memory|🚧|✔️|
+|included memtest |🚧|✔️|
+|reboot to firmware |🚧|✔️|
 
-# todo
-tl;dr more parity with `/nixos/modules/installer/cd-dvd/iso-image.nix`
-big ones that come to mind for now are
-- copy to memory
-- include memtest
-- include entrys for options such as
-  - reboot to firmware
+# limitations
+limine having OOTB secure boot enrollment with microsoft keys is likely far less practical than grub.
+Addiontally it'd likely cost a fortune and hold up bootloader updates to installer ISO's significantly
+
+[here](https://www.rodsbooks.com/efi-bootloaders/secureboot.html) is some helpful reading as to why.
+additionally [here](https://github.com/Limine-Bootloader/Limine/issues/512#issuecomment-3005320863) is why limine is likely a worse candidate than grub for the current most common approach to this problem.
